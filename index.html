@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>謎解きステージ選択</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Google Fonts 例: Roboto -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome 例: アイコン使用 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnH/PR+LhCJ3dg19X3O6zVtqjJRSlgqllfH+Zm3Pz0eQOa5uUPItJc9bdusExq7zR1Q8kEOWw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <header>
+        <h1>謎解きステージ選択</h1>
+    </header>
+    
+    <main>
+        <div class="stage-container">
+            <!-- ステージカードの例 -->
+            <div class="stage-card" onclick="selectStage('stage1')">
+                <img src="assets/stage1.jpg" alt="ステージ1">
+                <div class="stage-info">
+                    <h2>ステージ名1</h2>
+                    <p>作者名1</p>
+                </div>
+            </div>
+            <div class="stage-card" onclick="selectStage('stage2')">
+                <img src="assets/stage2.jpg" alt="ステージ2">
+                <div class="stage-info">
+                    <h2>ステージ名2</h2>
+                    <p>作者名2</p>
+                </div>
+            </div>
+            <!-- 追加のステージカードをここに追加 -->
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 謎解きサイト</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
