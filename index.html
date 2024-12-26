@@ -3,43 +3,286 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>謎解きステージ選択</title>
-    <link rel="stylesheet" href="styles.css">
-    <!-- Google Fonts 例: Roboto -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome 例: アイコン使用 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnH/PR+LhCJ3dg19X3O6zVtqjJRSlgqllfH+Zm3Pz0eQOa5uUPItJc9bdusExq7zR1Q8kEOWw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Stage Selection</title>
+    <style>
+        :root {
+            --primary-color: #00ffff;
+            --secondary-color: #ff00ff;
+            --background-dark: #0a0a2a;
+            --text-bright: #ffffff;
+            --neon-glow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: var(--background-dark);
+            color: var(--text-bright);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .stage-container {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 10vh;
+        }
+
+        .stage-image-container {
+            width: 80%;
+            aspect-ratio: 1;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .stage-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .stage-info {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .stage-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: var(--neon-glow);
+        }
+
+        .stage-author {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .controls {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .control-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .control-button:hover {
+            opacity: 0.8;
+        }
+
+        .control-button:active {
+            transform: scale(0.95);
+        }
+
+        .start-button {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .start-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-40%, -50%);
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 15px 0 15px 25px;
+            border-color: transparent transparent transparent #ffffff;
+        }
+
+        .nav-button {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-button svg {
+            width: 40px;
+            height: 40px;
+            fill: var(--text-bright);
+        }
+
+        .stage-transition {
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+        }
+
+        .stage-exit {
+            opacity: 0;
+            transform: translateX(-100%);
+        }
+
+        .stage-enter {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .start-button {
+            animation: pulse 2s infinite;
+        }
+
+        @media (max-width: 480px) {
+            .stage-container {
+                margin-top: 5vh;
+            }
+
+            .stage-title {
+                font-size: 1.8rem;
+            }
+
+            .stage-author {
+                font-size: 1rem;
+            }
+
+            .controls {
+                gap: 20px;
+            }
+
+            .start-button {
+                width: 70px;
+                height: 70px;
+            }
+
+            .nav-button {
+                width: 50px;
+                height: 50px;
+            }
+
+            .nav-button svg {
+                width: 30px;
+                height: 30px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>謎解きステージ選択</h1>
-    </header>
-    
-    <main>
-        <div class="stage-container">
-            <!-- ステージカードの例 -->
-            <div class="stage-card" onclick="selectStage('stage1')">
-                <img src="assets/stage1.jpg" alt="ステージ1">
-                <div class="stage-info">
-                    <h2>ステージ名1</h2>
-                    <p>作者名1</p>
-                </div>
-            </div>
-            <div class="stage-card" onclick="selectStage('stage2')">
-                <img src="assets/stage2.jpg" alt="ステージ2">
-                <div class="stage-info">
-                    <h2>ステージ名2</h2>
-                    <p>作者名2</p>
-                </div>
-            </div>
-            <!-- 追加のステージカードをここに追加 -->
+    <div class="stage-container">
+        <div class="stage-image-container">
+            <img src="https://souchan917.github.io/NAZOTOKI-PLAYER/assets/stage1.jpg" alt="Stage Image" class="stage-image">
         </div>
-    </main>
+        
+        <div class="stage-info">
+            <h2 class="stage-title">CYBER DREAMS</h2>
+            <p class="stage-author">Created by AKIRA</p>
+        </div>
 
-    <footer>
-        <p>&copy; 2024 謎解きサイト</p>
-    </footer>
+        <div class="controls">
+            <button class="control-button nav-button prev" onclick="prevStage()">
+                <svg viewBox="0 0 24 24">
+                    <path d="M18,7 L12,12 L18,17 L18,7 M11,7 L5,12 L11,17 L11,7"></path>
+                </svg>
+            </button>
+            
+            <button class="control-button start-button" onclick="startStage()">
+            </button>
+            
+            <button class="control-button nav-button next" onclick="nextStage()">
+                <svg viewBox="0 0 24 24">
+                    <path d="M6,7 L12,12 L6,17 L6,7 M13,7 L19,12 L13,17 L13,7"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
 
-    <script src="script.js"></script>
+    <script>
+        const stages = [
+            { title: "CYBER DREAMS", author: "AKIRA", image: "/api/placeholder/400/400" },
+            { title: "NEON PULSE", author: "YUKI", image: "/api/placeholder/400/400" },
+            { title: "TECHNO BREAKER", author: "REI", image: "/api/placeholder/400/400" },
+            { title: "FUTURE BEAT", author: "SORA", image: "/api/placeholder/400/400" }
+        ];
+
+        let currentStage = 0;
+
+        function updateStage(direction) {
+            const container = document.querySelector('.stage-container');
+            const image = container.querySelector('.stage-image');
+            const title = container.querySelector('.stage-title');
+            const author = container.querySelector('.stage-author');
+
+            // アニメーションクラスを追加
+            container.classList.add(direction === 'next' ? 'stage-exit' : 'stage-enter');
+
+            setTimeout(() => {
+                // ステージ情報を更新
+                image.src = stages[currentStage].image;
+                title.textContent = stages[currentStage].title;
+                author.textContent = `Created by ${stages[currentStage].author}`;
+
+                // アニメーションクラスを削除
+                container.classList.remove('stage-exit', 'stage-enter');
+            }, 300);
+        }
+
+        function nextStage() {
+            currentStage = (currentStage + 1) % stages.length;
+            updateStage('next');
+        }
+
+        function prevStage() {
+            currentStage = (currentStage - 1 + stages.length) % stages.length;
+            updateStage('prev');
+        }
+
+        function startStage() {
+            console.log(`Starting stage: ${stages[currentStage].title}`);
+            // ここにステージ開始のロジックを追加
+        }
+
+        // キーボードナビゲーション
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                nextStage();
+            } else if (e.key === 'ArrowLeft') {
+                prevStage();
+            } else if (e.key === 'Enter' || e.key === ' ') {
+                startStage();
+            }
+        });
+    </script>
 </body>
 </html>
