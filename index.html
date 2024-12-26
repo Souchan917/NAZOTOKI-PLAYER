@@ -6,11 +6,12 @@
     <title>Stage Selection</title>
     <style>
         :root {
-            --primary-color: #00ffff;
-            --secondary-color: #ff00ff;
-            --background-dark: #0a0a2a;
-            --text-bright: #ffffff;
-            --neon-glow: 0 0 10px rgba(0, 255, 255, 0.5);
+            --background: #0a0a12;
+            --surface: #1a1a1f;
+            --primary: #5c78ff;
+            --accent: #ff5ca8;
+            --text: #ffffff;
+            --glow: 0 0 20px rgba(92, 120, 255, 0.4);
         }
 
         * {
@@ -19,199 +20,355 @@
             box-sizing: border-box;
         }
 
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(92, 120, 255, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(92, 120, 255, 0.6); }
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { text-shadow: 0 0 10px rgba(92, 120, 255, 0.4); }
+            50% { text-shadow: 0 0 20px rgba(92, 120, 255, 0.8); }
+        }
+
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
         body {
-            font-family: 'Arial', sans-serif;
-            background: var(--background-dark);
-            color: var(--text-bright);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+            background: linear-gradient(-45deg, #0a0a12, #1a1a2f, #2a0a2f, #0a1a2f);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        .particle {
+            position: fixed;
+            pointer-events: none;
+            opacity: 0;
+            border-radius: 50%;
+            background: white;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 430px;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 20px;
-            overflow: hidden;
-        }
-
-        .stage-container {
-            width: 100%;
-            max-width: 500px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 10vh;
-        }
-
-        .stage-image-container {
-            width: 80%;
-            aspect-ratio: 1;
             position: relative;
-            margin-bottom: 20px;
+            justify-content: center;
+            padding-bottom: 40px;
+        }
+
+        .stage-image-wrapper {
+            width: 100%;
+            aspect-ratio: 1;
+            margin-top: 0;
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            animation: float 6s ease-in-out infinite;
         }
 
         .stage-image {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
-            transition: transform 0.3s ease;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stage-image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(92, 120, 255, 0.2), rgba(255, 92, 168, 0.2));
+            mix-blend-mode: overlay;
+            pointer-events: none;
+        }
+
+        .scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 0%,
+                rgba(92, 120, 255, 0.1) 50%,
+                transparent 100%
+            );
+            animation: scanline 4s linear infinite;
+            pointer-events: none;
         }
 
         .stage-info {
+            width: 100%;
             text-align: center;
-            margin-bottom: 40px;
+            margin-top: 24px;
+            padding: 0 20px;
+            position: relative;
         }
 
         .stage-title {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 8px;
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: var(--neon-glow);
+            animation: titleGlow 2s ease-in-out infinite;
         }
 
         .stage-author {
-            font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .controls {
             width: 100%;
+            margin-top: 40px;
             display: flex;
-            justify-content: center;
             align-items: center;
-            gap: 40px;
+            justify-content: center;
+            gap: 32px;
+            padding: 20px 40px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .controls:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
         }
 
         .control-button {
             background: none;
             border: none;
             cursor: pointer;
-            transition: transform 0.2s ease, opacity 0.2s ease;
+            padding: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 10px;
+            transition: all 0.3s ease;
+            border-radius: 50%;
+            position: relative;
         }
 
-        .control-button:hover {
-            opacity: 0.8;
+        .control-button::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
         }
 
-        .control-button:active {
-            transform: scale(0.95);
+        .control-button:hover::after {
+            opacity: 1;
+        }
+
+        .control-button svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text);
+            filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5));
         }
 
         .start-button {
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            background: linear-gradient(45deg, var(--primary), var(--accent));
             position: relative;
-            overflow: hidden;
+            transition: all 0.3s ease;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .start-button::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            opacity: 0.5;
+            filter: blur(8px);
+            animation: glowPulse 2s ease-in-out infinite;
         }
 
         .start-button::after {
             content: '';
             position: absolute;
             top: 50%;
-            left: 50%;
-            transform: translate(-40%, -50%);
+            left: 55%;
+            transform: translate(-50%, -50%);
             width: 0;
             height: 0;
             border-style: solid;
             border-width: 15px 0 15px 25px;
-            border-color: transparent transparent transparent #ffffff;
+            border-color: transparent transparent transparent var(--text);
         }
 
-        .nav-button {
-            position: relative;
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .start-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(92, 120, 255, 0.6);
         }
 
-        .nav-button svg {
-            width: 40px;
-            height: 40px;
-            fill: var(--text-bright);
+        .background-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
         }
 
-        .stage-transition {
-            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+        .background-current,
+        .background-next {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            filter: blur(8px) brightness(0.6);
         }
 
-        .stage-exit {
-            opacity: 0;
-            transform: translateX(-100%);
+        .background-next {
+            clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);
         }
 
-        .stage-enter {
-            opacity: 0;
-            transform: translateX(100%);
+        .background-current {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        @keyframes slideNextIn {
+            from {
+                clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);
+            }
+            to {
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            }
         }
 
-        .start-button {
-            animation: pulse 2s infinite;
+        @keyframes slideCurrentOut {
+            from {
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            }
+            to {
+                clip-path: polygon(-100% 0, 0 0, 0 100%, -100% 100%);
+            }
+        }
+
+        @keyframes slidePrevIn {
+            from {
+                clip-path: polygon(-100% 0, 0 0, 0 100%, -100% 100%);
+            }
+            to {
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            }
+        }
+
+        @keyframes slideCurrentOutReverse {
+            from {
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            }
+            to {
+                clip-path: polygon(100% 0, 200% 0, 200% 100%, 100% 100%);
+            }
         }
 
         @media (max-width: 480px) {
-            .stage-container {
-                margin-top: 5vh;
+            .container {
+                padding: 16px;
             }
 
-            .stage-title {
-                font-size: 1.8rem;
-            }
-
-            .stage-author {
-                font-size: 1rem;
+            .stage-image-wrapper {
+                margin-top: 8vh;
             }
 
             .controls {
-                gap: 20px;
+                gap: 24px;
+                padding: 16px 32px;
             }
 
             .start-button {
-                width: 70px;
-                height: 70px;
+                width: 60px;
+                height: 60px;
             }
 
-            .nav-button {
-                width: 50px;
-                height: 50px;
-            }
-
-            .nav-button svg {
-                width: 30px;
-                height: 30px;
+            .stage-title {
+                font-size: 24px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="stage-container">
-        <div class="stage-image-container">
-            <img src="https://souchan917.github.io/NAZOTOKI-PLAYER/assets/stage1.jpg" alt="Stage Image" class="stage-image">
+    <div class="background-wrapper">
+        <div class="background-current"></div>
+        <div class="background-next"></div>
+    </div>
+    <div class="container">
+        <div class="stage-image-wrapper">
+            <img src="assets/stage1.jpg" alt="Stage Image" class="stage-image">
+            <div class="stage-image-overlay"></div>
+            <div class="scanline"></div>
         </div>
         
         <div class="stage-info">
-            <h2 class="stage-title">CYBER DREAMS</h2>
+            <h2 class="stage-title">Cyber Dreams</h2>
             <p class="stage-author">Created by AKIRA</p>
         </div>
 
         <div class="controls">
-            <button class="control-button nav-button prev" onclick="prevStage()">
+            <button class="control-button" onclick="prevStage()">
                 <svg viewBox="0 0 24 24">
                     <path d="M18,7 L12,12 L18,17 L18,7 M11,7 L5,12 L11,17 L11,7"></path>
                 </svg>
@@ -220,7 +377,7 @@
             <button class="control-button start-button" onclick="startStage()">
             </button>
             
-            <button class="control-button nav-button next" onclick="nextStage()">
+            <button class="control-button" onclick="nextStage()">
                 <svg viewBox="0 0 24 24">
                     <path d="M6,7 L12,12 L6,17 L6,7 M13,7 L19,12 L13,17 L13,7"></path>
                 </svg>
@@ -230,46 +387,191 @@
 
     <script>
         const stages = [
-            { title: "CYBER DREAMS", author: "AKIRA", image: "/api/placeholder/400/400" },
-            { title: "NEON PULSE", author: "YUKI", image: "/api/placeholder/400/400" },
-            { title: "TECHNO BREAKER", author: "REI", image: "/api/placeholder/400/400" },
-            { title: "FUTURE BEAT", author: "SORA", image: "/api/placeholder/400/400" }
+            { 
+                title: "Cyber Dreams", 
+                author: "Created by AKIRA", 
+                image: "assets/stage1.jpg",
+                background: "assets/stage1.jpg",
+                music: "assets/music/stage1.mp3"
+            },
+            { 
+                title: "Neon Pulse", 
+                author: "Created by YUKI", 
+                image: "assets/stage2.jpg",
+                background: "assets/stage2.jpg",
+                music: "assets/music/stage2.mp3"
+            },
+            { 
+                title: "Techno Breaker", 
+                author: "Created by REI", 
+                image: "assets/stage3.jpg",
+                background: "assets/stage3.jpg",
+                music: "assets/music/stage3.mp3"
+            },
+            { 
+                title: "Future Beat", 
+                author: "Created by SORA", 
+                image: "assets/stage4.jpg",
+                background: "assets/stage4.jpg",
+                music: "assets/music/stage4.mp3"
+            }
         ];
 
         let currentStage = 0;
+        let currentAudio = null;
+        let fadeInterval = null;
 
-        function updateStage(direction) {
-            const container = document.querySelector('.stage-container');
-            const image = container.querySelector('.stage-image');
-            const title = container.querySelector('.stage-title');
-            const author = container.querySelector('.stage-author');
+        // 音楽再生の制御関数
+        function playStageMusic(stageIndex) {
+            if (currentAudio) {
+                fadeOutAndStop(currentAudio);
+            }
 
-            // アニメーションクラスを追加
-            container.classList.add(direction === 'next' ? 'stage-exit' : 'stage-enter');
+            const audio = new Audio(stages[stageIndex].music);
+            audio.volume = 0;
+            audio.loop = true;
+            audio.play();
+            fadeIn(audio);
+            currentAudio = audio;
+        }
+
+        function fadeIn(audio, duration = 1000) {
+            clearInterval(fadeInterval);
+            let volume = 0;
+            const steps = 20;
+            const increment = 1 / steps;
+            const intervalTime = duration / steps;
+
+            fadeInterval = setInterval(() => {
+                volume = Math.min(1, volume + increment);
+                audio.volume = volume;
+                if (volume >= 1) clearInterval(fadeInterval);
+            }, intervalTime);
+        }
+
+        function fadeOutAndStop(audio, duration = 1000) {
+            clearInterval(fadeInterval);
+            let volume = audio.volume;
+            const steps = 20;
+            const decrement = volume / steps;
+            const intervalTime = duration / steps;
+
+            fadeInterval = setInterval(() => {
+                volume = Math.max(0, volume - decrement);
+                audio.volume = volume;
+                if (volume <= 0) {
+                    clearInterval(fadeInterval);
+                    audio.pause();
+                    audio.currentTime = 0;
+                }
+            }, intervalTime);
+        }
+
+        // パーティクルエフェクトの作成
+        function createParticle(x, y) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            document.body.appendChild(particle);
+
+            const size = Math.random() * 4 + 2;
+            const destinationX = x + (Math.random() - 0.5) * 200;
+            const destinationY = y + (Math.random() - 0.5) * 200;
+            const rotation = Math.random() * 520;
+            const delay = Math.random() * 200;
+
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.left = `${x}px`;
+            particle.style.top = `${y}px`;
 
             setTimeout(() => {
-                // ステージ情報を更新
+                particle.style.transition = 'all 1s cubic-bezier(0.4, 0, 0.2, 1)';
+                particle.style.opacity = '1';
+                particle.style.transform = `translate(${destinationX - x}px, ${destinationY - y}px) rotate(${rotation}deg)`;
+                
+                setTimeout(() => {
+                    particle.style.opacity = '0';
+                    setTimeout(() => {
+                        document.body.removeChild(particle);
+                    }, 1000);
+                }, 600);
+            }, delay);
+        }
+
+        function createParticleEffect(x, y) {
+            for (let i = 0; i < 20; i++) {
+                createParticle(x, y);
+            }
+        }
+
+        function updateStage(direction) {
+            const image = document.querySelector('.stage-image');
+            const title = document.querySelector('.stage-title');
+            const author = document.querySelector('.stage-author');
+            const wrapper = document.querySelector('.stage-image-wrapper');
+            const currentBg = document.querySelector('.background-current');
+            const nextBg = document.querySelector('.background-next');
+
+            wrapper.style.transform = `scale(0.95)`;
+            image.style.opacity = '0';
+
+            // 次の背景を準備
+            nextBg.style.backgroundImage = `url(${stages[currentStage].background})`;
+
+            if (direction === 'next') {
+                nextBg.style.animation = 'slideNextIn 1s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                currentBg.style.animation = 'slideCurrentOut 1s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+            } else {
+                nextBg.style.animation = 'slidePrevIn 1s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                currentBg.style.animation = 'slideCurrentOutReverse 1s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+            }
+
+            setTimeout(() => {
+                // ステージ情報の更新
                 image.src = stages[currentStage].image;
                 title.textContent = stages[currentStage].title;
-                author.textContent = `Created by ${stages[currentStage].author}`;
+                author.textContent = stages[currentStage].author;
+                
+                wrapper.style.transform = '';
+                image.style.opacity = '1';
 
-                // アニメーションクラスを削除
-                container.classList.remove('stage-exit', 'stage-enter');
-            }, 300);
+                // 音楽を再生
+                playStageMusic(currentStage);
+
+                // アニメーション終了後、現在の背景を更新
+                currentBg.style.backgroundImage = nextBg.style.backgroundImage;
+                currentBg.style.animation = '';
+                nextBg.style.animation = '';
+                currentBg.style.clipPath = 'polygon(0 0, 100% 0, 100% 100%, 0 100%)';
+                nextBg.style.clipPath = 'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)';
+            }, 1000);
         }
 
         function nextStage() {
+            const button = event.currentTarget;
+            const rect = button.getBoundingClientRect();
+            createParticleEffect(rect.left + rect.width / 2, rect.top + rect.height / 2);
+
             currentStage = (currentStage + 1) % stages.length;
             updateStage('next');
         }
 
         function prevStage() {
+            const button = event.currentTarget;
+            const rect = button.getBoundingClientRect();
+            createParticleEffect(rect.left + rect.width / 2, rect.top + rect.height / 2);
+
             currentStage = (currentStage - 1 + stages.length) % stages.length;
             updateStage('prev');
         }
 
         function startStage() {
-            console.log(`Starting stage: ${stages[currentStage].title}`);
+            const button = event.currentTarget;
+            const rect = button.getBoundingClientRect();
+            createParticleEffect(rect.left + rect.width / 2, rect.top + rect.height / 2);
+
+            const currentStageData = stages[currentStage];
+            console.log(`Starting stage: ${currentStageData.title}`);
             // ここにステージ開始のロジックを追加
         }
 
@@ -282,6 +584,39 @@
             } else if (e.key === 'Enter' || e.key === ' ') {
                 startStage();
             }
+        });
+
+        // タッチスワイプ対応
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+        }, false);
+
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].clientX;
+            handleSwipe();
+        }, false);
+
+        function handleSwipe() {
+            const swipeDistance = touchEndX - touchStartX;
+            const minSwipeDistance = 50;
+
+            if (Math.abs(swipeDistance) > minSwipeDistance) {
+                if (swipeDistance > 0) {
+                    prevStage();
+                } else {
+                    nextStage();
+                }
+            }
+        }
+
+        // 初期化
+        window.addEventListener('DOMContentLoaded', () => {
+            const currentBg = document.querySelector('.background-current');
+            currentBg.style.backgroundImage = `url(${stages[currentStage].background})`;
+            playStageMusic(currentStage);
         });
     </script>
 </body>
